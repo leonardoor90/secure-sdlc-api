@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: secure-sdlc-api
+  
+  datasource:
+    url: jdbc:h2:mem:securedb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ${DB_PASSWORD:password}
+  
+  h2:
+    console:
+      enabled: false  # Desabilitar em produção
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: always
+    include-binding-errors: never
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:defaultSecretKeyForDevelopmentOnlyChangeInProduction}
+    expiration: ${JWT_EXPIRATION:86400000}
+  
+  rate-limit:
+    capacity: 100
+    refill-rate: 100
+    duration: 60
+
+logging:
+  level:
+    com.example.secureapi: INFO
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+  
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: when-authorized
+
+security:
+  headers:
+    csp: "default-src 'self'"
+    hsts: "max-age=31536000; includeSubDomains"
