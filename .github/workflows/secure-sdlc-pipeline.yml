@@ -52,18 +52,22 @@ jobs:
         with:
           sarif_file: semgrep.sarif
 
-  secrets-gitleaks:
-    name: "2. Secret Scanning (Gitleaks)"
+  secrets-trufflehog:
+    name: "2. Secret Scanning (TruffleHog)"
     runs-on: ubuntu-latest
     needs: [unit-tests]
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Run Gitleaks CLI
-        run: |
-          docker run --rm -v "${PWD}:/path" zricethezav/gitleaks:latest detect --source="/path" --verbose
-        continue-on-error: false
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+        # Se achar segredo, ele falha o pipeline (comportamento padrão)
 
   sca-dependency-check:
     name: "3. SCA (OWASP Dependency Check)"
@@ -78,7 +82,8 @@ jobs:
           java-version: "21"
           distribution: "temurin"
       - name: Run Dependency Check
-        run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=11
+        if: ${{ secrets.NVD_API_KEY != '' }}
+        run: mvn org.owasp:dependency-check-maven:check -DnvdApiKey=${{ secrets.NVD_API_KEY }} -DfailBuildOnCVSS=9
       - name: Upload Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -90,7 +95,7 @@ jobs:
   build-and-scan:
     name: "4. Build & Container Scan (Trivy)"
     runs-on: ubuntu-latest
-    needs: [sast-semgrep, secrets-gitleaks, sca-dependency-check]
+    needs: [sast-semgrep, secrets-trufflehog, sca-dependency-check]
     steps:
       - uses: actions/checkout@v4
       - name: Build Docker Image
