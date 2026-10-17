@@ -17,7 +17,7 @@ public class AuthControllerVulnerable {
     private static final Logger log = LoggerFactory.getLogger(AuthControllerVulnerable.class);
 
     // VULN 1: Hardcoded secrets
-    private static final String GITHUB_TOKEN = "ghp_1234567890abcdefghijklmnopqrstuvwxyz";
+    private static final String GITHUB_TOKEN = "ghp_999999999999999999999999999999999999";
     private static final String DB_PASSWORD = "admin123";
 
     // VULN 2: SQL Injection via concatenação de string (Agora com sintaxe Java correta)
