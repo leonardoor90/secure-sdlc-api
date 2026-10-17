@@ -55,12 +55,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Pega todo o histórico
-      - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # Nenhuma configuração extra
+          fetch-depth: 0 # Importante: Pega o histórico completo
+      - name: Run Gitleaks CLI
+        run: |
+          docker run --rm -v "${PWD}:/path" zricethezav/gitleaks:latest detect \
+            --source="/path" --verbose --redact --exit-code 1
+        continue-on-error: false # Queremos que ele falhe se achar algo
 
   container-trivy:
     name: Container Scan - Trivy
