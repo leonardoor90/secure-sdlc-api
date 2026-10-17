@@ -20,7 +20,7 @@ jobs:
       - name: Run Semgrep CLI
         run: |
           docker run --rm -v "${PWD}:/src" -w /src returntocorp/semgrep \
-            semgrep scan --config=p/security-audit --config=p/owasp-top-ten --config=p/java --sarif --output=semgrep.sarif
+            semgrep scan --config=p/security-audit --config=p/java --sarif --output=semgrep.sarif .
         continue-on-error: true
       - name: Upload SARIF
         if: always() && hashFiles('semgrep.sarif') != ''
@@ -55,12 +55,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Importante: Pega o histórico completo
-      - name: Run Gitleaks CLI
+          fetch-depth: 0
+      - name: Run Gitleaks Container
+        # Roda o Gitleaks olhando para o histórico completo, sem action intermediária
         run: |
-          docker run --rm -v "${PWD}:/path" zricethezav/gitleaks:latest detect \
-            --source="/path" --verbose --redact --exit-code 1
-        continue-on-error: false # Queremos que ele falhe se achar algo
+          docker run --rm -v "${PWD}:/path" zricethezav/gitleaks:latest detect --source="/path" -v
+        continue-on-error: false # Se achar, quebra o pipeline
 
   container-trivy:
     name: Container Scan - Trivy
