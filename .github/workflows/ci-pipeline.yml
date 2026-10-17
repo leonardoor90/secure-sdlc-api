@@ -42,18 +42,10 @@ jobs:
         with:
           java-version: "21"
           distribution: "temurin"
-<<<<<<< HEAD
-=======
-      
->>>>>>> main
       - name: Build with Maven
         run: mvn clean package -DskipTests
       - name: Build Docker Image
         run: docker build -t secure-sdlc-api:latest .
-<<<<<<< HEAD
-=======
-      
->>>>>>> main
       - name: Trivy Image Scan
         uses: aquasecurity/trivy-action@master
         continue-on-error: true # <-- Não quebra o pipeline se o scan falhar
@@ -63,14 +55,8 @@ jobs:
           output: "trivy-image.sarif"
           severity: "HIGH,CRITICAL"
           ignore-unfixed: true
-<<<<<<< HEAD
       - name: Upload Trivy Report
         if: always()
-=======
-      
-      - name: Upload Trivy Report
-        if: always() && hashFiles('trivy-image.sarif') != '' # <-- Só tenta enviar se o arquivo existir
->>>>>>> main
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "trivy-image.sarif"
