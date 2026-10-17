@@ -17,13 +17,13 @@ public class AuthControllerVulnerable {
     private static final Logger log = LoggerFactory.getLogger(AuthControllerVulnerable.class);
 
     // VULN 1: Hardcoded secrets
-    private static final String GITHUB_TOKEN = "ghp_1234567890abcdefghijklmnopqrstuvwxyz"; // VULNERABILIDADE: Segredo hardcoded
+    private static final String GITHUB_TOKEN = "ghp_1234567890abcdefghijklmnopqrstuvwxyz";
     private static final String DB_PASSWORD = "admin123";
 
-    // VULN 2: SQL Injection via concatenação de string
+    // VULN 2: SQL Injection via concatenação de string (Agora com sintaxe Java correta)
     @GetMapping("/users/search")
     public List<Map<String, Object>> searchUsers(@RequestParam String name) {
-        String query = "SELECT * FROM users WHERE name LIKE \x27%" + name + "%\x27";
+        String query = "SELECT * FROM users WHERE name LIKE '%" + name + "%'";
         log.warn("Executando query vulnerável: {}", query);
         return List.of(Map.of("query", query));
     }
