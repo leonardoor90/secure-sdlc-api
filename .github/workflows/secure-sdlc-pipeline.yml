@@ -67,7 +67,6 @@ jobs:
           base: ${{ github.event.repository.default_branch }}
           head: HEAD
           extra_args: --debug --only-verified
-        # Se achar segredo, ele falha o pipeline (comportamento padrão)
 
   sca-dependency-check:
     name: "3. SCA (OWASP Dependency Check)"
@@ -82,8 +81,7 @@ jobs:
           java-version: "21"
           distribution: "temurin"
       - name: Run Dependency Check
-        if: ${{ secrets.NVD_API_KEY != '' }}
-        run: mvn org.owasp:dependency-check-maven:check -DnvdApiKey=${{ secrets.NVD_API_KEY }} -DfailBuildOnCVSS=9
+        run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=9
       - name: Upload Report
         if: always()
         uses: actions/upload-artifact@v4
