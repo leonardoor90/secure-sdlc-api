@@ -2,11 +2,9 @@ name: Security Scan Pipeline
 
 on:
   push:
-    branches: [ main, develop, insecure-demo ]
+    branches: [ main, insecure-demo ]
   pull_request:
     branches: [ main ]
-  schedule:
-    - cron: "0 6 * * 1"
 
 permissions:
   contents: read
@@ -26,7 +24,6 @@ jobs:
             p/security-audit
             p/owasp-top-ten
             p/java
-          generateSarif: "1"
       - name: Upload SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v3
@@ -45,19 +42,13 @@ jobs:
           java-version: "21"
           distribution: "temurin"
       - name: Run Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: "Secure SDLC API"
-          path: "."
-          format: "HTML"
-          out: "reports"
-          args: "--failOnCVSS 9"
+        run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=11
       - name: Upload Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
-          path: reports/
+          path: target/dependency-check-report.html
 
   secrets-gitleaks:
     name: Secret Scanning - Gitleaks
@@ -76,7 +67,7 @@ jobs:
   container-trivy:
     name: Container Scan - Trivy
     runs-on: ubuntu-latest
-    needs: [sast-semgrep]
+    needs: [sca-dependency-check]
     steps:
       - uses: actions/checkout@v4
       - name: Build Docker Image
