@@ -17,7 +17,7 @@ public class AuthControllerVulnerable {
     private static final Logger log = LoggerFactory.getLogger(AuthControllerVulnerable.class);
 
     // VULN 1: Hardcoded secrets
-    private static final String JWT_SECRET = "12345678901234567890123456789012";
+    private static final String AWS_SECRET_KEY = "AKIAIOSFODNN7EXAMPLE"; // VULNERABILIDADE: Segredo hardcoded
     private static final String DB_PASSWORD = "admin123";
 
     // VULN 2: SQL Injection via concatenação de string
